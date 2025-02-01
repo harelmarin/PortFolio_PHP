@@ -1,0 +1,7 @@
+/vendor/
+composer.lock
+.env
+/cache/
+logs/
+/.vscode
+/.idea
