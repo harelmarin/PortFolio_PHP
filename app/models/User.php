@@ -3,14 +3,19 @@
 namespace App\Models;
 
 use App\Models\Crud; 
+use PDO;
+use App\Config\Database;
 
 
 class User extends Crud
 {
+    protected PDO $pdo;
+
     public function __construct()
     {
         // On passe le nom de la table au constructeur parent
         parent::__construct('users');
+        $this->pdo = Database::getPDO(); 
     }
 
     /**
@@ -35,5 +40,17 @@ class User extends Crud
     public function emailExists(string $email): bool
     {
         return (bool) $this->findByEmail($email);
+    }
+
+    public function addSkill(int $userId, int $skillId, string $level): bool
+    {
+        $sql = "INSERT INTO user_skills (user_id, skill_id, level) VALUES (?, ?, ?)";
+        
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([$userId, $skillId, $level]);
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 }

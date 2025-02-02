@@ -39,6 +39,26 @@
             <?php endif; ?>
         </div>
 
+        <div>
+            <h3>Compétences</h3>
+            <?php foreach ($skills as $skill): ?>
+                <div class="skill-item">
+                    <input type="checkbox" 
+                           name="skills[<?= $skill['id'] ?>]" 
+                           id="skill_<?= $skill['id'] ?>" 
+                           value="<?= $skill['id'] ?>">
+                    <label for="skill_<?= $skill['id'] ?>"><?= $skill['name'] ?></label>
+                    
+                    <select name="skill_levels[<?= $skill['id'] ?>]">
+                        <option value="Débutant">Débutant</option>
+                        <option value="Intermédiaire">Intermédiaire</option>
+                        <option value="Avancé">Avancé</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
         <button type="submit">S'inscrire</button>
     </form>
 </body>

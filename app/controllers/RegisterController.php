@@ -3,14 +3,17 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\Models\Skill;
 
 class RegisterController extends Controller
 {
     private User $userModel;
+    private Skill $skillModel;
 
     public function __construct()
     {
         $this->userModel = new User();
+        $this->skillModel = new Skill();
     }
 
     /**
@@ -18,8 +21,11 @@ class RegisterController extends Controller
      */
     public function register(): void
     {
+        $skills = $this->skillModel->findAll();
+        
         $this->render('register', [
-            'title' => 'Inscription'
+            'title' => 'Inscription',
+            'skills' => $skills
         ]);
     }
 
@@ -32,6 +38,9 @@ class RegisterController extends Controller
             header('Location: /register');
             exit;
         }
+
+        // Récupération des skills pour le formulaire
+        $skills = $this->skillModel->findAll();
 
         // Récupération et nettoyage des données
         $username = htmlspecialchars($_POST['username'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -62,7 +71,8 @@ class RegisterController extends Controller
             $this->render('register', [
                 'title' => 'Inscription',
                 'errors' => $errors,
-                'old' => compact('username', 'email')
+                'old' => compact('username', 'email'),
+                'skills' => $skills
             ]);
             return;
         }
@@ -76,6 +86,16 @@ class RegisterController extends Controller
         ]);
 
         if ($userId) {
+            // Traitement des skills
+            $selectedSkills = $_POST['skills'] ?? [];
+            $skillLevels = $_POST['skill_levels'] ?? [];
+
+            foreach ($selectedSkills as $skillId) {
+                if (isset($skillLevels[$skillId])) {
+                    $this->userModel->addSkill($userId, $skillId, $skillLevels[$skillId]);
+                }
+            }
+
             // Démarre la session
             session_start();
             
@@ -87,11 +107,12 @@ class RegisterController extends Controller
             exit;
         }
 
-        // En cas d'erreur
+        // En cas d'erreur générale
         $this->render('register', [
             'title' => 'Inscription',
             'errors' => ['general' => "Une erreur est survenue"],
-            'old' => compact('username', 'email')
+            'old' => compact('username', 'email'),
+            'skills' => $skills
         ]);
     }
 }

@@ -53,3 +53,15 @@ CREATE TABLE projects (
 
 
 
+INSERT INTO skills (name) VALUES 
+('HTML'),
+('CSS'),
+('JavaScript'),
+('PHP'),
+('MySQL'),
+('React'),
+('Node.js'),
+('Python'); 
+
+
+
