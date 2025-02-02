@@ -1,10 +1,11 @@
 <?php
-namespace App;
+namespace App\Models;
 
 use App\Config\Database;
 use PDO;
 use Exception;
-class Model {
+
+class Crud {
     
     protected string  $table = self::class;
     private ?\PDO $pdo = null; 
@@ -13,7 +14,6 @@ class Model {
     public function __construct(string $table = "", string $key = "id") {
         $this->table = $table;
         $this->pdo = Database::getPDO();
-        var_dump($this->pdo);
     }
     
     /**
@@ -123,29 +123,23 @@ class Model {
     /**
     * Insère une nouvelle ligne dans la base de données
     *
-    * @param array $values
+    * @param array $data
     * @return integer | false le nombre de ligne insérée (normalement une); false si une erreur est rencontrée
     */
-    public function create( array $values): int | bool  {
-        // INSERT INTO $table (keys_of_array_values) VALUES(bind_of_keys_of_array_values);
-        $table = $this->table;
-        $sql = "INSERT INTO $table (";
-        $keys = array_keys($values);
-        $keysStr = implode(', ', $keys);
-        $sql .= $keysStr . ") VALUES (:";
-        $paramsStr = implode(', :', $keys);
-        $sql .= $paramsStr;
+    public function create(array $data): int|false
+    {
+        $columns = implode(', ', array_keys($data));
+        $values = implode(', ', array_fill(0, count($data), '?'));
+        
+        $sql = "INSERT INTO {$this->table} ($columns) VALUES ($values)";
+        
         try {
-            $statement = $this->pdo->prepare($sql);
-            
-            foreach($values as $key => $val) {
-                $statement->bindParam(":$key", $val);
-            }
-            $statement->execute();
-            
-            return $this->pdo->lastInsertId();
-        } catch(Exception $e) {
-            echo($e->getMessage());
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(array_values($data));
+            return (int)$this->pdo->lastInsertId();
+        } catch (\PDOException $e) {
+            // Pour le debug
+            error_log($e->getMessage());
             return false;
         }
     }
