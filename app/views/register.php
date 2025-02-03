@@ -13,6 +13,7 @@
     <?php endif; ?>
 
     <form method="POST" action="/register">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <div>
             <label for="username">Nom d'utilisateur</label>
             <input type="text" id="username" name="username" 
@@ -60,6 +61,7 @@
         </div>
 
         <button type="submit">S'inscrire</button>
+        <p>Déjà un compte ? <a href="/">Se connecter</a></p>
     </form>
 </body>
 </html>

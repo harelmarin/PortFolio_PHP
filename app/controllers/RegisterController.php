@@ -102,7 +102,7 @@ class RegisterController extends Controller
             // Ajoute un message de succès dans la session si le compte est bien créé
             $_SESSION['success'] = "Compte créé avec succès ! Vous pouvez maintenant vous connecter.";
             
-            // Redirection vers l'index pour ce login
+            // Redirection vers le login
             header('Location: /');
             exit;
         }

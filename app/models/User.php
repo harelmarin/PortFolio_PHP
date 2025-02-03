@@ -53,4 +53,19 @@ class User extends Crud
             return false;
         }
     }
+
+    /**
+     * Récupère les compétences d'un utilisateur
+     */
+    public function getUserSkills(int $userId): array
+    {
+        $sql = "SELECT s.name, us.level 
+                FROM user_skills us 
+                JOIN skills s ON us.skill_id = s.id 
+                WHERE us.user_id = ?";
+                
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
 }
