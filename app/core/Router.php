@@ -22,22 +22,18 @@ class Router
         $this->routes['POST'][$path] = $action;
     }
     
-    /**
-     * Récupère l'URL actuelle
-     */
-    private function getCurrentUri(): string
+    private function matchRoute(string $requestUri, string $routePath): array|false
     {
-        $uri = $_SERVER['REQUEST_URI'];
+        // Convertir les paramètres de route en pattern regex
+        $pattern = preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $routePath);
+        $pattern = "#^" . $pattern . "$#";
         
-        // Retire les query parameters
-        $uri = explode('?', $uri)[0];
+        if (preg_match($pattern, $requestUri, $matches)) {
+            // Filtrer les matches pour ne garder que les paramètres nommés
+            return array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+        }
         
-        // Retire le chemin du script (index.php)
-        $scriptName = dirname($_SERVER['SCRIPT_NAME']);
-        $uri = str_replace($scriptName, '', $uri);
-        
-        // S'assure que l'URI commence par /
-        return '/' . trim($uri, '/');
+        return false;
     }
     
     /**
@@ -48,17 +44,34 @@ class Router
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = $this->getCurrentUri();
         
-        // Vérifie si la route existe
-        if (isset($this->routes[$method][$uri])) {
-            [$controller, $action] = $this->routes[$method][$uri];
+        // Parcourir toutes les routes enregistrées
+        foreach ($this->routes[$method] ?? [] as $route => $action) {
+            $matches = $this->matchRoute($uri, $route);
             
-            // Instancie le controller et appelle l'action
-            $controllerInstance = new $controller();
-            $controllerInstance->$action();
-        } else {
-            // Route non trouvée
-            header("HTTP/1.0 404 Not Found");
-            echo "404 Not Found";
+            if ($matches !== false) {
+                [$controller, $action] = $action;
+                $controllerInstance = new $controller();
+                
+                // Extraire les paramètres de l'URL
+                $params = array_slice($matches, 1);
+                
+                // Appeler la méthode du controller avec les paramètres
+                call_user_func_array([$controllerInstance, $action], $params);
+                return;
+            }
         }
+        
+        // Route non trouvée
+        header("HTTP/1.0 404 Not Found");
+        echo "404 Not Found";
+    }
+    
+    private function getCurrentUri(): string
+    {
+        $uri = $_SERVER['REQUEST_URI'];
+        $uri = explode('?', $uri)[0];
+        $scriptName = dirname($_SERVER['SCRIPT_NAME']);
+        $uri = str_replace($scriptName, '', $uri);
+        return '/' . trim($uri, '/');
     }
 }

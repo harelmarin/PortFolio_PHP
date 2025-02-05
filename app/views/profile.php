@@ -19,8 +19,8 @@
             <ul>
             <?php foreach ($skills as $skill): ?>
                 <li>
-                    <?= htmlspecialchars($skill['name'] ?? '', ENT_QUOTES, 'UTF-8') ?> - 
-                    <?= htmlspecialchars($skill['level'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                    <?= htmlspecialchars($skill['name'], ENT_QUOTES, 'UTF-8') ?> - 
+                    Niveau : <?= htmlspecialchars($skill['level'], ENT_QUOTES, 'UTF-8') ?>
                 </li>
             <?php endforeach; ?>
             </ul>
@@ -30,6 +30,7 @@
     </div>
 
     <div class="actions">
+        <a href="/dashboard">Gérer mes compétences</a>
         <a href="/profile/edit">Modifier mon profil</a>
         <a href="/logout">Déconnexion</a>
     </div>

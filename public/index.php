@@ -12,6 +12,7 @@ use App\Core\Router;
 use App\Controllers\RegisterController;
 use App\Controllers\LoginController;
 use App\Controllers\ProfileController;
+use App\Controllers\DashboardController;
 
 // Initialisation du router
 $router = new Router();
@@ -23,6 +24,10 @@ $router->get('/logout', [LoginController::class, 'logout']);
 $router->get('/register', [RegisterController::class, 'register']);
 $router->post('/register', [RegisterController::class, 'store']);
 $router->get('/profile', [ProfileController::class, 'index']);
+$router->get('/dashboard', [DashboardController::class, 'index']);
+$router->post('/dashboard/skills/add', [DashboardController::class, 'addSkill']);
+$router->post('/dashboard/skills/update', [DashboardController::class, 'updateSkills']);
+$router->post('/dashboard/skills/delete/{id}', [DashboardController::class, 'deleteSkill']);
 
 // Génération du token CSRF
 if (empty($_SESSION['csrf_token'])) {
