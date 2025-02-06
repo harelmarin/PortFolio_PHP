@@ -164,4 +164,34 @@ class User extends Crud
             return false;
         }
     }
+
+    public function getUserProjects(int $userId): array
+    {
+        $sql = "SELECT * FROM projects WHERE user_id = ? ORDER BY created_at DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
+
+    public function addProject(int $userId, string $title, string $description, string $imageData): bool
+    {
+        $sql = "INSERT INTO projects (user_id, title, description, image_data) VALUES (?, ?, ?, ?)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$userId, $title, $description, $imageData]);
+    }
+
+    public function deleteProject(int $userId, int $projectId): bool
+    {
+        try {
+            $sql = "DELETE FROM projects WHERE id = ? AND user_id = ?";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$projectId, $userId]);
+            
+            // Vérifie si une ligne a été supprimée
+            return $stmt->rowCount() > 0;
+        } catch (\PDOException $e) {
+            error_log("Erreur lors de la suppression du projet : " . $e->getMessage());
+            return false;
+        }
+    }
 }

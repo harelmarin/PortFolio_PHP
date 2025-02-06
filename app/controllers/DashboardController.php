@@ -78,6 +78,12 @@ class DashboardController extends Controller
 
     public function updateSkills(): void
     {
+        // Vérification CSRF
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            header('Location: /dashboard');
+            exit;
+        }
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: /');
             exit;
@@ -129,6 +135,97 @@ class DashboardController extends Controller
 
         header('Content-Type: application/json');
         echo json_encode(['success' => $success]);
+        exit;
+    }
+
+    public function projects(): void
+    {
+        // Vérification de l'authentification
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /');
+            exit;
+        }
+
+        // Récupération des projets de l'utilisateur
+        $projects = $this->userModel->getUserProjects((int)$_SESSION['user_id']);
+
+        $this->render('projects', [
+            'title' => 'Gérer mes projets',
+            'projects' => $projects
+        ]);
+    }
+
+    public function addProject(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /');
+            exit;
+        }
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            // Vérifications de sécurité
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $_FILES['image']['tmp_name']);
+            finfo_close($finfo);
+
+            if (!in_array($mimeType, $allowedTypes)) {
+                $_SESSION['message'] = ['type' => 'error', 'text' => 'Type de fichier non autorisé'];
+                header('Location: /dashboard/projects');
+                exit;
+            }
+
+            // Lecture et encodage de l'image
+            $imageData = file_get_contents($_FILES['image']['tmp_name']);
+            $base64Image = base64_encode($imageData);
+
+            // Ajout du projet avec l'image
+            $success = $this->userModel->addProject(
+                (int)$_SESSION['user_id'],
+                $_POST['title'],
+                $_POST['description'],
+                $base64Image
+            );
+
+            if ($success) {
+                $_SESSION['message'] = ['type' => 'success', 'text' => 'Projet ajouté avec succès'];
+            } else {
+                $_SESSION['message'] = ['type' => 'error', 'text' => 'Erreur lors de l\'ajout du projet'];
+            }
+        }
+
+        header('Location: /dashboard/projects');
+        exit;
+    }
+
+    public function deleteProject(string $id): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /');
+            exit;
+        }
+
+        // Vérification CSRF
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            header('Location: /dashboard/projects');
+            exit;
+        }
+
+        $projectId = (int)$id;
+        $userId = (int)$_SESSION['user_id'];
+
+        // Ajoutez un log pour déboguer
+        error_log("Tentative de suppression du projet $projectId par l'utilisateur $userId");
+
+        $success = $this->userModel->deleteProject($userId, $projectId);
+
+        if ($success) {
+            $_SESSION['message'] = ['type' => 'success', 'text' => 'Projet supprimé avec succès'];
+        } else {
+            $_SESSION['message'] = ['type' => 'error', 'text' => 'Erreur lors de la suppression du projet'];
+        }
+
+        header('Location: /dashboard/projects');
         exit;
     }
 } 

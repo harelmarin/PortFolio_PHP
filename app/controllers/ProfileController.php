@@ -31,11 +31,13 @@ class ProfileController extends Controller
         // Récupère les informations (déjà protégé par PDO::prepare)
         $user = $this->userModel->find((int)$_SESSION['user_id']);
         $skills = $this->userModel->getUserSkills((int)$_SESSION['user_id']);
+        $projects = $this->userModel->getUserProjects((int)$_SESSION['user_id']);
 
         $this->render('profile', [
             'title' => 'Mon Profil',
             'user' => $user,
-            'skills' => $skills
+            'skills' => $skills,
+            'projects' => $projects
         ]);
     }
 }

@@ -42,21 +42,24 @@ class Router
     public function run(): void
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        $uri = $this->getCurrentUri();
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         
         // Parcourir toutes les routes enregistrées
         foreach ($this->routes[$method] ?? [] as $route => $action) {
-            $matches = $this->matchRoute($uri, $route);
+            // Convertir les paramètres de route en pattern regex
+            $pattern = preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $route);
+            $pattern = "#^" . $pattern . "$#";
             
-            if ($matches !== false) {
+            if (preg_match($pattern, $uri, $matches)) {
                 [$controller, $action] = $action;
                 $controllerInstance = new $controller();
                 
-                // Extraire les paramètres de l'URL
-                $params = array_slice($matches, 1);
+                // Filtrer pour ne garder que les paramètres nommés
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                unset($params[0]); // Supprimer la correspondance complète
                 
                 // Appeler la méthode du controller avec les paramètres
-                call_user_func_array([$controllerInstance, $action], $params);
+                call_user_func_array([$controllerInstance, $action], array_values($params));
                 return;
             }
         }

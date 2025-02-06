@@ -41,14 +41,12 @@ CREATE TABLE user_skills (
     FOREIGN KEY (skill_id) REFERENCES skills(id) ON DELETE CASCADE
 );
 CREATE TABLE projects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    title VARCHAR(150) NOT NULL,
-    description TEXT NOT NULL,
-    image VARCHAR(255),
-    external_link VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    title VARCHAR(255),
+    description TEXT,
+    image_data LONGBLOB,  -- Pour stocker l'image en base64
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 

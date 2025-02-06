@@ -28,6 +28,9 @@ $router->get('/dashboard', [DashboardController::class, 'index']);
 $router->post('/dashboard/skills/add', [DashboardController::class, 'addSkill']);
 $router->post('/dashboard/skills/update', [DashboardController::class, 'updateSkills']);
 $router->post('/dashboard/skills/delete/{id}', [DashboardController::class, 'deleteSkill']);
+$router->get('/dashboard/projects', [DashboardController::class, 'projects']);
+$router->post('/dashboard/projects/add', [DashboardController::class, 'addProject']);
+$router->post('/dashboard/projects/delete/{id}', [DashboardController::class, 'deleteProject']);
 
 // Génération du token CSRF
 if (empty($_SESSION['csrf_token'])) {

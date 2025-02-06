@@ -15,6 +15,8 @@
     <div class="skills-form">
         <h2>Mes Compétences</h2>
         <form action="/dashboard/skills/update" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            
             <div>
                 <h3>Compétences</h3>
                 <?php 

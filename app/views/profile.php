@@ -29,9 +29,36 @@
         <?php endif; ?>
     </div>
 
+    <div class="projects">
+        <h2>Mes Projets</h2>
+        <?php if (!empty($projects)): ?>
+            <div class="projects-grid">
+                <?php foreach ($projects as $project): ?>
+                    <div class="project-card">
+                        <?php if (!empty($project['image_data'])): ?>
+                            <img src="data:image/jpeg;base64,<?= $project['image_data'] ?>" 
+                                 alt="<?= htmlspecialchars($project['title'] ?? '') ?>"
+                                 style="max-width: 300px; height: auto;">
+                        <?php endif; ?>
+                        
+                        <h3><?= htmlspecialchars($project['title'] ?? '') ?></h3>
+                        <p><?= htmlspecialchars($project['description'] ?? '') ?></p>
+                        
+                        <?php if (!empty($project['external_link'] ?? null)): ?>
+                            <a href="<?= htmlspecialchars($project['external_link']) ?>" 
+                               target="_blank">Voir le projet</a>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p>Aucun projet pour le moment</p>
+        <?php endif; ?>
+    </div>
+
     <div class="actions">
         <a href="/dashboard">Gérer mes compétences</a>
-        <a href="/profile/edit">Modifier mon profil</a>
+        <a href="/dashboard/projects">Gérer mes projets</a>
         <a href="/logout">Déconnexion</a>
     </div>
 </body>
