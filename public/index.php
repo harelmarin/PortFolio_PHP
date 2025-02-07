@@ -13,6 +13,7 @@ use App\Controllers\RegisterController;
 use App\Controllers\LoginController;
 use App\Controllers\ProfileController;
 use App\Controllers\DashboardController;
+use App\Controllers\AdminController;
 
 // Initialisation du router
 $router = new Router();
@@ -31,6 +32,8 @@ $router->post('/dashboard/skills/delete/{id}', [DashboardController::class, 'del
 $router->get('/dashboard/projects', [DashboardController::class, 'projects']);
 $router->post('/dashboard/projects/add', [DashboardController::class, 'addProject']);
 $router->post('/dashboard/projects/delete/{id}', [DashboardController::class, 'deleteProject']);
+$router->get('/admin', [AdminController::class, 'index']);
+$router->post('/admin/skills/add', [AdminController::class, 'addSkill']);
 
 // Génération du token CSRF
 if (empty($_SESSION['csrf_token'])) {

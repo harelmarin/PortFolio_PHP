@@ -175,9 +175,21 @@ class User extends Crud
 
     public function addProject(int $userId, string $title, string $description, string $imageData): bool
     {
-        $sql = "INSERT INTO projects (user_id, title, description, image_data) VALUES (?, ?, ?, ?)";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$userId, $title, $description, $imageData]);
+        try {
+            $sql = "INSERT INTO projects (user_id, title, description, image) 
+                    VALUES (:user_id, :title, :description, :image)";
+                    
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([
+                'user_id' => $userId,
+                'title' => $title,
+                'description' => $description,
+                'image' => $imageData  // Assurez-vous que le nom du paramètre correspond à la colonne
+            ]);
+        } catch (\PDOException $e) {
+            error_log($e->getMessage());
+            return false;
+        }
     }
 
     public function deleteProject(int $userId, int $projectId): bool
@@ -192,6 +204,33 @@ class User extends Crud
         } catch (\PDOException $e) {
             error_log("Erreur lors de la suppression du projet : " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function findFiltered(string $search = '', string $role = ''): array
+    {
+        try {
+            $sql = "SELECT * FROM users WHERE 1=1";
+            $params = [];
+
+            if (!empty($search)) {
+                $sql .= " AND (username LIKE :search OR email LIKE :search)";
+                $params['search'] = "%$search%";
+            }
+
+            if (!empty($role)) {
+                $sql .= " AND role = :role";
+                $params['role'] = $role;
+            }
+
+            $sql .= " ORDER BY created_at DESC";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log($e->getMessage());
+            return [];
         }
     }
 }

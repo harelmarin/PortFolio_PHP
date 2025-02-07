@@ -162,35 +162,28 @@ class DashboardController extends Controller
             exit;
         }
 
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            // Vérifications de sécurité
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $_FILES['image']['tmp_name']);
-            finfo_close($finfo);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $title = trim(htmlspecialchars($_POST['title'] ?? '', ENT_QUOTES, 'UTF-8'));
+            $description = trim(htmlspecialchars($_POST['description'] ?? '', ENT_QUOTES, 'UTF-8'));
+            $externalLink = trim(htmlspecialchars($_POST['external_link'] ?? '', ENT_QUOTES, 'UTF-8'));
 
-            if (!in_array($mimeType, $allowedTypes)) {
-                $_SESSION['message'] = ['type' => 'error', 'text' => 'Type de fichier non autorisé'];
-                header('Location: /dashboard/projects');
-                exit;
-            }
+            // Traitement de l'image
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $imageData = base64_encode(file_get_contents($_FILES['image']['tmp_name']));
+                
+                $success = $this->userModel->addProject(
+                    (int)$_SESSION['user_id'],
+                    $title,
+                    $description,
+                    $imageData,
+                    $externalLink
+                );
 
-            // Lecture et encodage de l'image
-            $imageData = file_get_contents($_FILES['image']['tmp_name']);
-            $base64Image = base64_encode($imageData);
-
-            // Ajout du projet avec l'image
-            $success = $this->userModel->addProject(
-                (int)$_SESSION['user_id'],
-                $_POST['title'],
-                $_POST['description'],
-                $base64Image
-            );
-
-            if ($success) {
-                $_SESSION['message'] = ['type' => 'success', 'text' => 'Projet ajouté avec succès'];
-            } else {
-                $_SESSION['message'] = ['type' => 'error', 'text' => 'Erreur lors de l\'ajout du projet'];
+                if ($success) {
+                    $_SESSION['message'] = ['type' => 'success', 'text' => 'Projet ajouté avec succès'];
+                } else {
+                    $_SESSION['message'] = ['type' => 'error', 'text' => 'Erreur lors de l\'ajout du projet'];
+                }
             }
         }
 
