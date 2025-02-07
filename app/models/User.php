@@ -7,6 +7,9 @@ use PDO;
 use App\Config\Database;
 
 
+/**
+ * Gère les opérations liées aux utilisateurs dans la base de données
+ */
 class User extends Crud
 {
     protected PDO $pdo;
@@ -20,6 +23,9 @@ class User extends Crud
 
     /**
      * Trouve un utilisateur par son email
+     * 
+     * @param string $email L'email de l'utilisateur
+     * @return array|false Les données de l'utilisateur ou false si non trouvé
      */
     public function findByEmail(string $email): array|false
     {
@@ -135,6 +141,9 @@ class User extends Crud
 
     /**
      * Récupère les compétences d'un utilisateur
+     * 
+     * @param int $userId L'identifiant de l'utilisateur
+     * @return array Liste des compétences avec leurs niveaux
      */
     public function getUserSkills(int $userId): array
     {

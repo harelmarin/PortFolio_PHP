@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Models\User;
 use App\Models\Skill;
 
+/**
+ * Contrôleur gérant l'inscription des nouveaux utilisateurs
+ */
 class RegisterController extends Controller
 {
     private User $userModel;
@@ -18,6 +21,8 @@ class RegisterController extends Controller
 
     /**
      * Affiche le formulaire d'inscription
+     * 
+     * @return void
      */
     public function register(): void
     {
@@ -30,7 +35,10 @@ class RegisterController extends Controller
     }
 
     /**
-     * Traite le formulaire d'inscription
+     * Traite les données du formulaire d'inscription
+     * Crée un nouvel utilisateur et ses compétences associées
+     * 
+     * @return void
      */
     public function store(): void
     {

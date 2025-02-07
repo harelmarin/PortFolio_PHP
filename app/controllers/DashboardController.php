@@ -5,6 +5,10 @@ namespace App\Controllers;
 use App\Models\User;
 use App\Models\Skill;
 
+/**
+ * Contrôleur gérant le tableau de bord utilisateur
+ * Permet la gestion des compétences et des projets
+ */
 class DashboardController extends Controller
 {
     private User $userModel;
@@ -16,6 +20,11 @@ class DashboardController extends Controller
         $this->skillModel = new Skill();
     }
 
+    /**
+     * Affiche le tableau de bord avec les compétences de l'utilisateur
+     * 
+     * @return void
+     */
     public function index(): void
     {
         // Vérification de l'authentification
@@ -36,6 +45,11 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Ajoute une nouvelle compétence pour l'utilisateur
+     * 
+     * @return void
+     */
     public function addSkill(): void
     {
         if (!isset($_SESSION['user_id'])) {
@@ -78,6 +92,11 @@ class DashboardController extends Controller
         exit;
     }
 
+    /**
+     * Met à jour les compétences de l'utilisateur
+     * 
+     * @return void
+     */
     public function updateSkills(): void
     {
         // Vérifications CSRF et session
@@ -130,22 +149,11 @@ class DashboardController extends Controller
         exit;
     }
 
-    public function deleteSkill(int $skillId): void
-    {
-        if (!isset($_SESSION['user_id'])) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false]);
-            exit;
-        }
-
-        $userId = (int)$_SESSION['user_id'];
-        $success = $this->userModel->deleteSkill($userId, $skillId);
-
-        header('Content-Type: application/json');
-        echo json_encode(['success' => $success]);
-        exit;
-    }
-
+    /**
+     * Affiche la page de gestion des projets
+     * 
+     * @return void
+     */
     public function projects(): void
     {
         // Vérification de l'authentification
@@ -163,6 +171,11 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Ajoute un nouveau projet
+     * 
+     * @return void
+     */
     public function addProject(): void
     {
         if (!isset($_SESSION['user_id'])) {
@@ -199,6 +212,12 @@ class DashboardController extends Controller
         exit;
     }
 
+    /**
+     * Supprime un projet spécifique
+     * 
+     * @param string $id Identifiant du projet à supprimer
+     * @return void
+     */
     public function deleteProject(string $id): void
     {
         if (!isset($_SESSION['user_id'])) {

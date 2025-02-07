@@ -68,13 +68,5 @@ class Router
         header("HTTP/1.0 404 Not Found");
         echo "404 Not Found";
     }
-    
-    private function getCurrentUri(): string
-    {
-        $uri = $_SERVER['REQUEST_URI'];
-        $uri = explode('?', $uri)[0];
-        $scriptName = dirname($_SERVER['SCRIPT_NAME']);
-        $uri = str_replace($scriptName, '', $uri);
-        return '/' . trim($uri, '/');
-    }
+
 }

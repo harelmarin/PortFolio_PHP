@@ -4,6 +4,9 @@ namespace App\Controllers;
 
 use App\Models\User;
 
+/**
+ * Contrôleur gérant l'affichage et la gestion du profil utilisateur
+ */
 class ProfileController extends Controller
 {
     private User $userModel;
@@ -13,6 +16,12 @@ class ProfileController extends Controller
         $this->userModel = new User();
     }
 
+    /**
+     * Affiche le profil de l'utilisateur connecté
+     * Inclut ses compétences et ses projets
+     * 
+     * @return void
+     */
     public function index(): void
     {
         // Vérifie si l'utilisateur est connecté

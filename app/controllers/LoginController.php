@@ -4,6 +4,9 @@ namespace App\Controllers;
 
 use App\Models\User;
 
+/**
+ * Contrôleur gérant l'authentification des utilisateurs
+ */
 class LoginController extends Controller
 {
     private User $userModel;
@@ -15,6 +18,8 @@ class LoginController extends Controller
 
     /**
      * Affiche le formulaire de connexion
+     * 
+     * @return void
      */
     public function login(): void
     {
@@ -29,7 +34,10 @@ class LoginController extends Controller
     }
 
     /**
-     * Traite le formulaire de connexion
+     * Authentifie l'utilisateur
+     * Vérifie les identifiants et crée la session
+     * 
+     * @return void
      */
     public function authenticate(): void
     {
@@ -92,7 +100,10 @@ class LoginController extends Controller
     }
 
     /**
-     * Déconnexion
+     * Déconnecte l'utilisateur
+     * Détruit la session et redirige vers la page d'accueil
+     * 
+     * @return void
      */
     public function logout(): void
     {
