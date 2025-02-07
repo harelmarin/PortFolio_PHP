@@ -26,11 +26,13 @@ class DashboardController extends Controller
 
         $user = $this->userModel->find((int)$_SESSION['user_id']);
         $skills = $this->userModel->getUserSkills((int)$_SESSION['user_id']);
+        $availableSkills = $this->skillModel->findAll();
 
         $this->render('dashboard', [
             'title' => 'Tableau de bord',
             'user' => $user,
-            'skills' => $skills
+            'skills' => $skills,
+            'availableSkills' => $availableSkills
         ]);
     }
 
@@ -78,7 +80,7 @@ class DashboardController extends Controller
 
     public function updateSkills(): void
     {
-        // Vérification CSRF
+        // Vérifications CSRF et session
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             header('Location: /dashboard');
             exit;
@@ -89,36 +91,42 @@ class DashboardController extends Controller
             exit;
         }
 
-        $selectedSkills = $_POST['skills'] ?? [];
-        $skillLevels = $_POST['skill_levels'] ?? [];
         $userId = (int)$_SESSION['user_id'];
 
         try {
-            // Supprimer toutes les compétences actuelles de l'utilisateur
+            // Commencer par supprimer toutes les compétences existantes de l'utilisateur
             $this->userModel->deleteAllUserSkills($userId);
 
-            // Ajouter les compétences sélectionnées
-            foreach ($selectedSkills as $skillName => $value) {
-                if (isset($skillLevels[$skillName])) {
-                    $level = $skillLevels[$skillName];
-                    if (in_array($level, ['Débutant', 'Intermédiaire', 'Avancé', 'Expert'])) {
-                        $this->userModel->addSkill($userId, $skillName, $level);
-                    }
+            // Vérifier si on a reçu des compétences
+            if (!isset($_POST['skills']) || !isset($_POST['skill_levels'])) {
+                throw new \Exception('Aucune compétence sélectionnée');
+            }
+
+            // Ajouter les nouvelles compétences
+            foreach ($_POST['skills'] as $skillId => $value) {
+                $skillId = (int)$skillId;
+                $level = $_POST['skill_levels'][$skillId] ?? null;
+
+                if (!$level || !in_array($level, ['Débutant', 'Intermédiaire', 'Avancé', 'Expert'])) {
+                    continue;
                 }
+
+                $this->userModel->addSkillById($userId, $skillId, $level);
             }
 
             $_SESSION['message'] = [
                 'type' => 'success',
                 'text' => 'Compétences mises à jour avec succès'
             ];
+
         } catch (\Exception $e) {
             $_SESSION['message'] = [
                 'type' => 'error',
-                'text' => 'Erreur lors de la mise à jour des compétences'
+                'text' => 'Erreur : ' . $e->getMessage()
             ];
         }
 
-        header('Location: /profile');
+        header('Location: /dashboard');
         exit;
     }
 

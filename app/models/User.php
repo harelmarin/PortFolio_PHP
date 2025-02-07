@@ -88,12 +88,12 @@ class User extends Crud
                 'level' => $skillLevel
             ]);
             
-            // Valider la transaction
+            // Valide la transaction
             $this->pdo->commit();
             return $success;
             
         } catch (\PDOException $e) {
-            // En cas d'erreur, annuler la transaction
+            // En cas d'erreur, annule la transaction
             $this->pdo->rollBack();
             error_log($e->getMessage());
             return false;
@@ -155,14 +155,9 @@ class User extends Crud
 
     public function deleteAllUserSkills(int $userId): bool
     {
-        try {
-            $sql = "DELETE FROM user_skills WHERE user_id = :user_id";
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute(['user_id' => $userId]);
-        } catch (\PDOException $e) {
-            error_log($e->getMessage());
-            return false;
-        }
+        $sql = "DELETE FROM user_skills WHERE user_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$userId]);
     }
 
     public function getUserProjects(int $userId): array
@@ -173,21 +168,22 @@ class User extends Crud
         return $stmt->fetchAll();
     }
 
-    public function addProject(int $userId, string $title, string $description, string $imageData): bool
+    public function addProject(int $userId, string $title, string $description, string $imageData, ?string $externalLink = null): bool
     {
         try {
-            $sql = "INSERT INTO projects (user_id, title, description, image) 
-                    VALUES (:user_id, :title, :description, :image)";
-                    
+            $sql = "INSERT INTO projects (user_id, title, description, image_data, external_link) 
+                    VALUES (?, ?, ?, ?, ?)";
+            
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
-                'user_id' => $userId,
-                'title' => $title,
-                'description' => $description,
-                'image' => $imageData  // Assurez-vous que le nom du paramètre correspond à la colonne
+                $userId,
+                $title,
+                $description,
+                $imageData,
+                $externalLink
             ]);
         } catch (\PDOException $e) {
-            error_log($e->getMessage());
+            error_log("Erreur lors de l'ajout du projet : " . $e->getMessage());
             return false;
         }
     }
@@ -232,5 +228,12 @@ class User extends Crud
             error_log($e->getMessage());
             return [];
         }
+    }
+
+    public function addSkillById(int $userId, int $skillId, string $level): bool
+    {
+        $sql = "INSERT INTO user_skills (user_id, skill_id, level) VALUES (?, ?, ?)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$userId, $skillId, $level]);
     }
 }

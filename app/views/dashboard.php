@@ -19,44 +19,50 @@
             <form action="/dashboard/skills/update" method="POST" class="skills-form">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 
-                <div class="skills-grid">
-                    <?php 
-                    $userSkillsMap = [];
-                    foreach ($skills as $skill) {
-                        $userSkillsMap[$skill['name']] = [
-                            'id' => $skill['id'],
-                            'level' => $skill['level']
-                        ];
+                <?php
+                /**
+                 * Initialisation du tableau des compétences actuelles de l'utilisateur
+                 * @var array $currentSkills Tableau associatif [skill_id => level]
+                 */
+                $currentSkills = [];
+                foreach ($skills as $skill) {
+                    if (isset($skill['id'])) {
+                        $currentSkills[$skill['id']] = $skill['level'];
+                    } elseif (isset($skill['skill_id'])) {
+                        $currentSkills[$skill['skill_id']] = $skill['level'];
                     }
-                    
-                    $availableSkills = [
-                        'HTML', 'CSS', 'JavaScript', 'PHP', 
-                        'MySQL', 'React', 'Node.js', 'Python'
-                    ];
-                    
-                    foreach ($availableSkills as $skillName): 
-                        $isChecked = isset($userSkillsMap[$skillName]);
-                        $currentLevel = $isChecked ? $userSkillsMap[$skillName]['level'] : '';
-                    ?>
+                }
+                ?>
+
+                <div class="skills-grid">
+                    <?php foreach($availableSkills as $skill): ?>
                         <div class="skill-card">
                             <div class="skill-header">
                                 <input type="checkbox" 
-                                       name="skills[<?= htmlspecialchars($skillName) ?>]" 
-                                       id="skill_<?= htmlspecialchars($skillName) ?>" 
-                                       value="<?= htmlspecialchars($skillName) ?>"
-                                       <?= $isChecked ? 'checked' : '' ?>>
-                                <label for="skill_<?= htmlspecialchars($skillName) ?>">
-                                    <?= htmlspecialchars($skillName) ?>
+                                       name="skills[<?= $skill['id'] ?>]" 
+                                       value="<?= $skill['id'] ?>" 
+                                       id="skill_<?= $skill['id'] ?>"
+                                       <?= isset($currentSkills[$skill['id']]) ? 'checked' : '' ?>>
+                                <label for="skill_<?= $skill['id'] ?>">
+                                    <?= htmlspecialchars($skill['name']) ?>
                                 </label>
                             </div>
                             
                             <div class="skill-level">
-                                <select name="skill_levels[<?= htmlspecialchars($skillName) ?>]" 
-                                        class="level-select <?= $isChecked ? 'active' : '' ?>">
-                                    <option value="Débutant" <?= $currentLevel === 'Débutant' ? 'selected' : '' ?>>Débutant</option>
-                                    <option value="Intermédiaire" <?= $currentLevel === 'Intermédiaire' ? 'selected' : '' ?>>Intermédiaire</option>
-                                    <option value="Avancé" <?= $currentLevel === 'Avancé' ? 'selected' : '' ?>>Avancé</option>
-                                    <option value="Expert" <?= $currentLevel === 'Expert' ? 'selected' : '' ?>>Expert</option>
+                                <select name="skill_levels[<?= $skill['id'] ?>]">
+                                    <?php 
+                                    /**
+                                     * Définition des niveaux de compétence disponibles
+                                     * @var array $levels Liste des niveaux possibles
+                                     */
+                                    $levels = ['Débutant', 'Avancé', 'Expert'];
+                                    foreach ($levels as $level): ?>
+                                        <option value="<?= $level ?>" 
+                                                <?= (isset($currentSkills[$skill['id']]) && 
+                                                    strtolower($currentSkills[$skill['id']]) === strtolower($level)) ? 'selected' : '' ?>>
+                                            <?= $level ?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>

@@ -21,7 +21,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="/login" method="POST" class="auth-form">
+            <form action="/" method="POST" class="auth-form">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="form-group">
                     <label for="email">Email :</label>

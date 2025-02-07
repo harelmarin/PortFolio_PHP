@@ -42,7 +42,7 @@
             </form>
 
             <div class="auth-links">
-                <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+                <p>Déjà un compte ? <a href="/">Se connecter</a></p>
             </div>
         </div>
     </div>

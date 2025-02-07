@@ -38,32 +38,33 @@
                 <div class="projects-grid">
                     <?php foreach ($projects as $project): ?>
                         <div class="project-card">
-                            <?php if (!empty($project['external_link'])): ?>
-                                <a href="<?= htmlspecialchars($project['external_link'], ENT_QUOTES, 'UTF-8') ?>" 
-                                   target="_blank" 
-                                   class="project-link">
+                            <?php if (!empty($project['image_data'])): ?>
+                                <?php 
+                                // Si l'image est déjà en base64, pas besoin de l'encoder à nouveau
+                                $imageData = $project['image_data'];
+                                if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $imageData)) {
+                                    // Si ce n'est pas du base64, on encode
+                                    $imageData = base64_encode($project['image_data']);
+                                }
+                                ?>
+                                <img src="data:image/jpeg;base64,<?= $imageData ?>" 
+                                     alt="<?= htmlspecialchars($project['title']) ?>"
+                                     class="project-image">
                             <?php endif; ?>
                             
-                            <div class="project-image">
-                                <img src="data:image/jpeg;base64,<?= $project['image'] ?>" 
-                                     alt="<?= htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8') ?>">
-                            </div>
                             <div class="project-info">
-                                <h3><?= htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8') ?></h3>
-                                <p><?= htmlspecialchars($project['description'], ENT_QUOTES, 'UTF-8') ?></p>
-                                <?php if (!empty($project['external_link'])): ?>
-                                    <a href="<?= htmlspecialchars($project['external_link'], ENT_QUOTES, 'UTF-8') ?>" 
+                                <h3><?= htmlspecialchars($project['title'] ?? '') ?></h3>
+                                <p><?= htmlspecialchars($project['description'] ?? '') ?></p>
+                                
+                                <?php if (!empty($project['external_link'] ?? null)): ?>
+                                    <a href="<?= htmlspecialchars($project['external_link']) ?>" 
                                        target="_blank" 
                                        class="project-external-link">
                                         <i class="fas fa-external-link-alt"></i> 
-                                        <?= htmlspecialchars($project['external_link'], ENT_QUOTES, 'UTF-8') ?>
+                                        Voir le projet
                                     </a>
                                 <?php endif; ?>
                             </div>
-                            
-                            <?php if (!empty($project['external_link'])): ?>
-                                </a>
-                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
