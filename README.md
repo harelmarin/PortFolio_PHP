@@ -1,5 +1,9 @@
 # Projet Portfolio - Gestion des Utilisateurs et des Compétences
 
+GROUPE :
+Marin : https://github.com/harelmarin
+Yulan : https://github.com/yulannn
+
 ## Présentation du Projet
 
 Ce projet est une application web développée en PHP & MySQL permettant aux utilisateurs de :
